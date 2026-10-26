@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediCore — Hospital Management System</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Figtree:wght@400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#070b12;--s1:#0c1018;--s2:#111922;--s3:#18212e;--s4:#1e2b3a;
+  --bd:#1c2a3a;--bd2:#243347;
+  --blue:#3b82f6;--blueg:rgba(59,130,246,.13);
+  --teal:#14b8a6;--tealg:rgba(20,184,166,.13);
+  --purp:#8b5cf6;--purpg:rgba(139,92,246,.13);
+  --rose:#f43f5e;--roseg:rgba(244,63,94,.13);
+  --amb:#f59e0b;--ambg:rgba(245,158,11,.13);
+  --tx:#ddeeff;--t2:#7a92b4;--t3:#3d5270;
+  --sw:256px;--r:10px;--rs:7px;
+}
+html,body{height:100%;-webkit-font-smoothing:antialiased}
+body{font-family:'Figtree',sans-serif;background:var(--bg);color:var(--tx);overflow-x:hidden}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(59,130,246,.018) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(59,130,246,.018) 1px,transparent 1px);
+  background-size:38px 38px;
+}
+.app{display:flex;min-height:100vh;position:relative;z-index:1}
+.main{flex:1;margin-left:var(--sw);display:flex;flex-direction:column;min-height:100vh}
+.content{padding:28px 32px;flex:1}
+.sidebar{width:var(--sw);background:var(--s1);border-right:1px solid var(--bd);position:fixed;inset:0 auto 0 0;display:flex;flex-direction:column;z-index:100}
+.sidebar::after{content:'';position:absolute;top:0;right:-1px;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,var(--blue) 40%,var(--teal) 70%,transparent);opacity:.22}
+.logo{padding:22px 20px 18px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.logo-w{font-family:'Syne',sans-serif;font-weight:800;font-size:21px;letter-spacing:-.4px}
+.logo-w em{font-style:normal;color:var(--blue)}
+.logo-t{font-size:10px;color:var(--t3);letter-spacing:2px;text-transform:uppercase;margin-top:3px}
+nav{flex:1;padding:12px 10px;overflow-y:auto}
+nav::-webkit-scrollbar{display:none}
+.ng{margin-bottom:2px}
+.nl{font-size:9.5px;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;color:var(--t3);padding:10px 12px 5px}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--rs);cursor:pointer;color:var(--t2);font-size:13.5px;transition:all .15s;user-select:none;position:relative}
+.ni:hover{background:var(--s2);color:var(--tx)}
+.ni.on{background:var(--blueg);color:var(--blue);font-weight:500}
+.ni.on::before{content:'';position:absolute;left:0;top:25%;bottom:25%;width:2.5px;border-radius:2px;background:var(--blue)}
+.ni svg{width:16px;height:16px;flex-shrink:0;stroke-width:2}
+.nc{margin-left:auto;font-size:11px;font-weight:600;background:var(--s3);color:var(--t2);padding:1px 7px;border-radius:20px;min-width:22px;text-align:center}
+.ni.on .nc{background:var(--blueg);color:var(--blue)}
+.sfoot{padding:14px 16px;border-top:1px solid var(--bd);flex-shrink:0}
+.dbpill{display:inline-flex;align-items:center;gap:7px;background:var(--s2);border:1px solid var(--bd);padding:6px 12px;border-radius:20px;font-size:11.5px;color:var(--t2)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--teal);box-shadow:0 0 6px var(--teal);animation:blink 2.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.topbar{height:62px;background:var(--s1);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:50;gap:16px}
+.tb-left{display:flex;align-items:center;gap:14px;flex:1}
+.ptitle{font-family:'Syne',sans-serif;font-weight:700;font-size:19px}
+.sbox{position:relative;flex:1;max-width:300px;display:none}
+.sbox.show{display:block}
+.sbox input{width:100%;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:8px 12px 8px 36px;font-family:'Figtree',sans-serif;font-size:13.5px;color:var(--tx);outline:none;transition:border-color .2s,box-shadow .2s}
+.sbox input::placeholder{color:var(--t3)}
+.sbox input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blueg)}
+.sico{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t3)}
+.sico svg{width:15px;height:15px}
+.tb-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--rs);font-family:'Figtree',sans-serif;font-size:13.5px;font-weight:500;cursor:pointer;border:none;transition:all .18s;white-space:nowrap;outline:none}
+.btn svg{width:15px;height:15px;flex-shrink:0}
+.btn-p{background:var(--blue);color:#fff;box-shadow:0 4px 14px rgba(59,130,246,.25)}
+.btn-p:hover{background:#2563eb;transform:translateY(-1px);box-shadow:0 6px 20px rgba(59,130,246,.4)}
+.btn-g{background:var(--s2);color:var(--t2);border:1px solid var(--bd)}
+.btn-g:hover{background:var(--s3);color:var(--tx)}
+.btn-d{background:var(--roseg);color:var(--rose);border:1px solid rgba(244,63,94,.2)}
+.btn-d:hover{background:rgba(244,63,94,.25)}
+.btn-xs{padding:4px 9px;font-size:12px}
+.sec{display:none}
+.sec.on{display:block;animation:fup .22s ease}
+@keyframes fup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.sgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:24px}
+.sc{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:18px 20px 16px;position:relative;overflow:hidden;transition:transform .18s,border-color .18s}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.sc.cb::before{background:linear-gradient(90deg,var(--blue),transparent)}
+.sc.ct::before{background:linear-gradient(90deg,var(--teal),transparent)}
+.sc.cp::before{background:linear-gradient(90deg,var(--purp),transparent)}
+.sc.cr::before{background:linear-gradient(90deg,var(--rose),transparent)}
+.sc.ca::before{background:linear-gradient(90deg,var(--amb),transparent)}
+.sc:hover{transform:translateY(-2px)}
+.sc.cb:hover{border-color:rgba(59,130,246,.4)}
+.sc.ct:hover{border-color:rgba(20,184,166,.4)}
+.sc.cp:hover{border-color:rgba(139,92,246,.4)}
+.sc.cr:hover{border-color:rgba(244,63,94,.4)}
+.sc.ca:hover{border-color:rgba(245,158,11,.4)}
+.slb{font-size:11px;color:var(--t3);letter-spacing:1px;text-transform:uppercase}
+.sv{font-family:'Syne',sans-serif;font-size:34px;font-weight:800;margin:6px 0 3px;line-height:1}
+.sc.cb .sv{color:var(--blue)}.sc.ct .sv{color:var(--teal)}.sc.cp .sv{color:var(--purp)}.sc.cr .sv{color:var(--rose)}.sc.ca .sv{color:var(--amb)}
+.ss{font-size:11.5px;color:var(--t3)}
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.ch{padding:16px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ct2{font-family:'Syne',sans-serif;font-weight:600;font-size:15px}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:24px}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+thead th{text-align:left;padding:11px 16px;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--t3);border-bottom:1px solid var(--bd);white-space:nowrap;background:var(--s2)}
+tbody tr{border-bottom:1px solid rgba(28,42,58,.5);transition:background .12s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(17,25,34,.7)}
+tbody td{padding:13px 16px;color:var(--t2);vertical-align:middle}
+tbody td:first-child{color:var(--tx)}
+.tact{display:flex;gap:6px;align-items:center}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:500;white-space:nowrap}
+.bd-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.bb{background:var(--blueg);color:var(--blue)}.bt{background:var(--tealg);color:var(--teal)}.bp{background:var(--purpg);color:var(--purp)}.br{background:var(--roseg);color:var(--rose)}.ba{background:var(--ambg);color:var(--amb)}.bg2{background:var(--s3);color:var(--t2)}
+.chip{display:inline-block;background:var(--s3);border:1px solid var(--bd2);border-radius:5px;padding:2px 7px;font-size:11px;font-family:monospace;color:var(--t3)}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(5px);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;padding:20px}
+.ov.open{opacity:1;pointer-events:all}
+.modal{background:var(--s1);border:1px solid var(--bd2);border-radius:16px;width:100%;max-width:580px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.6);transform:scale(.96) translateY(12px);transition:transform .25s cubic-bezier(.4,0,.2,1)}
+.modal::-webkit-scrollbar{width:4px}
+.modal::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+.ov.open .modal{transform:scale(1) translateY(0)}
+.mh{padding:22px 24px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--s1);z-index:1}
+.mt{font-family:'Syne',sans-serif;font-weight:700;font-size:17px}
+.mc{background:var(--s2);border:1px solid var(--bd);color:var(--t2);width:30px;height:30px;border-radius:var(--rs);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .15s}
+.mc:hover{background:var(--s3);color:var(--tx)}
+.mb{padding:22px 24px}
+.mf{padding:0 24px 22px;display:flex;justify-content:flex-end;gap:10px}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg label{font-size:12px;font-weight:500;color:var(--t2)}
+.fc{background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:9px 12px;font-family:'Figtree',sans-serif;font-size:13.5px;color:var(--tx);outline:none;width:100%;transition:border-color .18s,box-shadow .18s}
+.fc::placeholder{color:var(--t3)}
+.fc:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blueg)}
+select.fc option{background:var(--s2)}
+textarea.fc{resize:vertical;min-height:80px;line-height:1.5}
+.fgrid{display:grid;gap:14px}
+.f2{grid-template-columns:1fr 1fr}
+.ffall{grid-column:1/-1}
+.req{color:var(--rose)}
+.empty{text-align:center;padding:52px 24px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.empty svg{width:44px;height:44px;color:var(--t3);opacity:.5}
+.empty h3{font-size:15px;color:var(--t2)}
+.empty p{font-size:13px;color:var(--t3)}
+#toasts{position:fixed;bottom:22px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:var(--s2);border:1px solid var(--bd2);border-radius:var(--r);padding:12px 16px;display:flex;align-items:center;gap:11px;box-shadow:0 8px 32px rgba(0,0,0,.5);min-width:260px;max-width:360px;pointer-events:all;animation:tin .28s cubic-bezier(.4,0,.2,1)}
+.toast.ts{border-left:3px solid var(--teal)}.toast.te{border-left:3px solid var(--rose)}.toast.ti{border-left:3px solid var(--blue)}
+.tico svg{width:16px;height:16px}
+.tmsg{font-size:13.5px;color:var(--tx);flex:1}
+@keyframes tin{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+@media(max-width:1200px){.sgrid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:900px){.sgrid{grid-template-columns:1fr 1fr}.dgrid{grid-template-columns:1fr}.f2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-w">Medi<em>Core</em></div>
+    <div class="logo-t">Hospital Management</div>
+  </div>
+  <nav>
+    <div class="ng">
+      <div class="nl">Overview</div>
+      <div class="ni on" data-sec="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </div>
+    </div>
+    <div class="ng">
+      <div class="nl">Management</div>
+      <div class="ni" data-sec="doctors">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Doctors<span class="nc" id="nc-doctors">0</span>
+      </div>
+      <div class="ni" data-sec="patients">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Patients<span class="nc" id="nc-patients">0</span>
+      </div>
+      <div class="ni" data-sec="appointments">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Appointments<span class="nc" id="nc-appointments">0</span>
+      </div>
+    </div>
+    <div class="ng">
+      <div class="nl">Clinical</div>
+      <div class="ni" data-sec="medicines">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+        Medicines<span class="nc" id="nc-medicines">0</span>
+      </div>
+      <div class="ni" data-sec="prescriptions">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Prescriptions<span class="nc" id="nc-prescriptions">0</span>
+      </div>
+    </div>
+  </nav>
+  <div class="sfoot">
+    <div class="dbpill"><div class="dot"></div>SQLite + REST API</div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="tb-left">
+      <div class="ptitle" id="ptitle">Dashboard</div>
+      <div class="sbox" id="sbox">
+        <div class="sico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+        <input type="text" id="srch" placeholder="Search…" autocomplete="off">
+      </div>
+    </div>
+    <div class="tb-right">
+      <button class="btn btn-p" id="addbtn" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span id="addlbl">Add</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="sec on" id="sec-dashboard">
+      <div class="sgrid">
+        <div class="sc cb"><div class="slb">Doctors</div><div class="sv" id="sd-doc">0</div><div class="ss">Physicians</div></div>
+        <div class="sc cp"><div class="slb">Patients</div><div class="sv" id="sd-pat">0</div><div class="ss">Registered</div></div>
+        <div class="sc ct"><div class="slb">Appointments</div><div class="sv" id="sd-apt">0</div><div class="ss">Total booked</div></div>
+        <div class="sc cr"><div class="slb">Prescriptions</div><div class="sv" id="sd-prs">0</div><div class="ss">Total issued</div></div>
+        <div class="sc ca"><div class="slb">Medicines</div><div class="sv" id="sd-med">0</div><div class="ss">In inventory</div></div>
+      </div>
+      <div class="dgrid">
+        <div class="card">
+          <div class="ch"><div class="ct2">Recent Appointments</div><span class="badge bb">Latest 5</span></div>
+          <div class="tw"><table><thead><tr><th>ID</th><th>Patient</th><th>Doctor</th><th>Date</th><th>Status</th></tr></thead><tbody id="d-appt"></tbody></table></div>
+        </div>
+        <div class="card">
+          <div class="ch"><div class="ct2">Recent Prescriptions</div><span class="badge br">Latest 5</span></div>
+          <div class="tw"><table><thead><tr><th>ID</th><th>Patient</th><th>Medicine</th><th>Doctor</th><th>Qty</th></tr></thead><tbody id="d-presc"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCTORS -->
+    <div class="sec" id="sec-doctors">
+      <div class="card"><div class="ch"><div class="ct2">All Doctors</div></div>
+        <div class="tw"><table><thead><tr><th>ID</th><th>Name</th><th>Specialization</th><th>Gender</th><th>Phone</th><th>Email</th><th>Appts</th><th>Actions</th></tr></thead><tbody id="tb-doctors"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- PATIENTS -->
+    <div class="sec" id="sec-patients">
+      <div class="card"><div class="ch"><div class="ct2">All Patients</div></div>
+        <div class="tw"><table><thead><tr><th>ID</th><th>Name</th><th>Age</th><th>Gender</th><th>Phone</th><th>Email</th><th>Address</th><th>Appts</th><th>Actions</th></tr></thead><tbody id="tb-patients"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- APPOINTMENTS -->
+    <div class="sec" id="sec-appointments">
+      <div class="card"><div class="ch"><div class="ct2">All Appointments</div></div>
+        <div class="tw"><table><thead><tr><th>ID</th><th>Patient</th><th>Doctor</th><th>Date & Time</th><th>Status</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="tb-appointments"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- MEDICINES -->
+    <div class="sec" id="sec-medicines">
+      <div class="card"><div class="ch"><div class="ct2">Medicine Inventory</div></div>
+        <div class="tw"><table><thead><tr><th>ID</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Prescribed</th><th>Actions</th></tr></thead><tbody id="tb-medicines"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- PRESCRIPTIONS -->
+    <div class="sec" id="sec-prescriptions">
+      <div class="card"><div class="ch"><div class="ct2">All Prescriptions</div></div>
+        <div class="tw"><table><thead><tr><th>ID</th><th>Appt</th><th>Patient</th><th>Doctor</th><th>Medicine</th><th>Qty</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="tb-prescriptions"></tbody></table></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- MODAL: Doctor -->
+<div class="ov" id="ov-doc"><div class="modal">
+  <div class="mh"><div class="mt" id="mt-doc">Add Doctor</div><div class="mc" onclick="CM('ov-doc')">✕</div></div>
+  <div class="mb"><div class="fgrid f2">
+    <div class="fg ffall"><label>Full Name <span class="req">*</span></label><input class="fc" id="df-name" placeholder="Dr. Jane Smith"></div>
+    <div class="fg"><label>Specialization</label><input class="fc" id="df-spec" placeholder="Cardiology"></div>
+    <div class="fg"><label>Gender</label><select class="fc" id="df-gender"><option value="M">Male</option><option value="F">Female</option><option value="Other">Other</option></select></div>
+    <div class="fg"><label>Phone</label><input class="fc" id="df-phone" placeholder="555-0100"></div>
+    <div class="fg"><label>Email</label><input class="fc" id="df-email" type="email" placeholder="dr@hospital.com"></div>
+  </div></div>
+  <div class="mf"><button class="btn btn-g" onclick="CM('ov-doc')">Cancel</button><button class="btn btn-p" onclick="saveDoctor()">Save Doctor</button></div>
+</div></div>
+
+<!-- MODAL: Patient -->
+<div class="ov" id="ov-pat"><div class="modal">
+  <div class="mh"><div class="mt" id="mt-pat">Add Patient</div><div class="mc" onclick="CM('ov-pat')">✕</div></div>
+  <div class="mb"><div class="fgrid f2">
+    <div class="fg ffall"><label>Full Name <span class="req">*</span></label><input class="fc" id="pf-name" placeholder="John Doe"></div>
+    <div class="fg"><label>Age</label><input class="fc" id="pf-age" type="number" placeholder="35" min="0" max="150"></div>
+    <div class="fg"><label>Gender</label><select class="fc" id="pf-gender"><option value="M">Male</option><option value="F">Female</option><option value="Other">Other</option></select></div>
+    <div class="fg"><label>Phone</label><input class="fc" id="pf-phone" placeholder="555-1000"></div>
+    <div class="fg"><label>Email</label><input class="fc" id="pf-email" type="email" placeholder="patient@email.com"></div>
+    <div class="fg ffall"><label>Address</label><input class="fc" id="pf-addr" placeholder="123 Main St, City"></div>
+  </div></div>
+  <div class="mf"><button class="btn btn-g" onclick="CM('ov-pat')">Cancel</button><button class="btn btn-p" onclick="savePatient()">Save Patient</button></div>
+</div></div>
+
+<!-- MODAL: Appointment -->
+<div class="ov" id="ov-apt"><div class="modal">
+  <div class="mh"><div class="mt" id="mt-apt">Book Appointment</div><div class="mc" onclick="CM('ov-apt')">✕</div></div>
+  <div class="mb"><div class="fgrid f2">
+    <div class="fg"><label>Patient <span class="req">*</span></label><select class="fc" id="af-pat"></select></div>
+    <div class="fg"><label>Doctor <span class="req">*</span></label><select class="fc" id="af-doc"></select></div>
+    <div class="fg"><label>Date & Time <span class="req">*</span></label><input class="fc" id="af-date" type="datetime-local"></div>
+    <div class="fg"><label>Status</label><select class="fc" id="af-status"><option>Scheduled</option><option>Completed</option><option>Cancelled</option><option>No-Show</option></select></div>
+    <div class="fg ffall"><label>Notes</label><textarea class="fc" id="af-notes" placeholder="Reason for visit…"></textarea></div>
+  </div></div>
+  <div class="mf"><button class="btn btn-g" onclick="CM('ov-apt')">Cancel</button><button class="btn btn-p" onclick="saveAppointment()">Book Appointment</button></div>
+</div></div>
+
+<!-- MODAL: Medicine -->
+<div class="ov" id="ov-med"><div class="modal">
+  <div class="mh"><div class="mt" id="mt-med">Add Medicine</div><div class="mc" onclick="CM('ov-med')">✕</div></div>
+  <div class="mb"><div class="fgrid f2">
+    <div class="fg ffall"><label>Medicine Name <span class="req">*</span></label><input class="fc" id="mf-name" placeholder="Amoxicillin 500mg"></div>
+    <div class="fg"><label>Category</label><input class="fc" id="mf-cat" placeholder="Antibiotic"></div>
+    <div class="fg"><label>Price ($)</label><input class="fc" id="mf-price" type="number" placeholder="0.00" min="0" step="0.01"></div>
+    <div class="fg"><label>Stock (units)</label><input class="fc" id="mf-stock" type="number" placeholder="100" min="0"></div>
+  </div></div>
+  <div class="mf"><button class="btn btn-g" onclick="CM('ov-med')">Cancel</button><button class="btn btn-p" onclick="saveMedicine()">Save Medicine</button></div>
+</div></div>
+
+<!-- MODAL: Prescription -->
+<div class="ov" id="ov-prs"><div class="modal">
+  <div class="mh"><div class="mt" id="mt-prs">New Prescription</div><div class="mc" onclick="CM('ov-prs')">✕</div></div>
+  <div class="mb"><div class="fgrid f2">
+    <div class="fg ffall"><label>Appointment <span class="req">*</span></label><select class="fc" id="rf-apt"></select></div>
+    <div class="fg ffall"><label>Medicine <span class="req">*</span></label><select class="fc" id="rf-med"></select></div>
+    <div class="fg"><label>Quantity</label><input class="fc" id="rf-qty" type="number" value="1" min="1"></div>
+    <div class="fg ffall"><label>Dosage / Notes</label><textarea class="fc" id="rf-notes" placeholder="Take twice daily after meals…"></textarea></div>
+  </div></div>
+  <div class="mf"><button class="btn btn-g" onclick="CM('ov-prs')">Cancel</button><button class="btn btn-p" onclick="savePrescription()">Save Prescription</button></div>
+</div></div>
+
+<div id="toasts"></div>
+
+<script>
+'use strict';
+
+// ════════════════════════════════════════════════════════════
+//  API Helper — all calls go to /api/...
+// ════════════════════════════════════════════════════════════
+const API = {
+  async get(path) {
+    const r = await fetch(path);
+    if (!r.ok) throw new Error(await r.text());
+    return r.json();
+  },
+  async post(path, body) {
+    const r = await fetch(path, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    if (!r.ok) { const e = await r.json(); throw new Error(e.error || 'Request failed'); }
+    return r.json();
+  },
+  async put(path, body) {
+    const r = await fetch(path, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    if (!r.ok) { const e = await r.json(); throw new Error(e.error || 'Request failed'); }
+    return r.json();
+  },
+  async del(path) {
+    const r = await fetch(path, { method:'DELETE' });
+    if (!r.ok) { const e = await r.json(); throw new Error(e.error || 'Request failed'); }
+    return r.json();
+  }
+};
+
+let editId = null, curSec = 'dashboard', srchTerm = '';
+
+// ════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════════════════════════
+const META = {
+  dashboard:    {title:'Dashboard',    search:false, add:null},
+  doctors:      {title:'Doctors',      search:true,  add:'Add Doctor'},
+  patients:     {title:'Patients',     search:true,  add:'Add Patient'},
+  appointments: {title:'Appointments', search:true,  add:'Book Appointment'},
+  medicines:    {title:'Medicines',    search:true,  add:'Add Medicine'},
+  prescriptions:{title:'Prescriptions',search:true,  add:'Add Prescription'},
+};
+
+function nav(sec) {
+  curSec = sec; srchTerm = '';
+  document.getElementById('srch').value = '';
+  document.querySelectorAll('.ni[data-sec]').forEach(n => n.classList.toggle('on', n.dataset.sec === sec));
+  document.querySelectorAll('.sec').forEach(s => s.classList.toggle('on', s.id === 'sec-' + sec));
+  const m = META[sec];
+  document.getElementById('ptitle').textContent = m.title;
+  const ab = document.getElementById('addbtn');
+  ab.style.display = m.add ? '' : 'none';
+  document.getElementById('addlbl').textContent = m.add || '';
+  document.getElementById('sbox').classList.toggle('show', !!m.search);
+  render(sec);
+}
+document.querySelectorAll('.ni[data-sec]').forEach(n => n.addEventListener('click', () => nav(n.dataset.sec)));
+document.getElementById('addbtn').addEventListener('click', () => { editId = null; openModal(curSec); });
+document.getElementById('srch').addEventListener('input', e => { srchTerm = e.target.value; render(curSec); });
+
+function render(sec) {
+  if (sec === 'dashboard')    renderDash();
+  if (sec === 'doctors')      renderDoctors();
+  if (sec === 'patients')     renderPatients();
+  if (sec === 'appointments') renderAppointments();
+  if (sec === 'medicines')    renderMedicines();
+  if (sec === 'prescriptions')renderPrescriptions();
+}
+
+// ════════════════════════════════════════════════════════════
+//  RENDER FUNCTIONS
+// ════════════════════════════════════════════════════════════
+async function renderDash() {
+  const c = await API.get('/api/dashboard');
+  document.getElementById('sd-doc').textContent = c.docs;
+  document.getElementById('sd-pat').textContent = c.pats;
+  document.getElementById('sd-apt').textContent = c.apts;
+  document.getElementById('sd-prs').textContent = c.prss;
+  document.getElementById('sd-med').textContent = c.meds;
+  document.getElementById('nc-doctors').textContent      = c.docs;
+  document.getElementById('nc-patients').textContent     = c.pats;
+  document.getElementById('nc-appointments').textContent = c.apts;
+  document.getElementById('nc-medicines').textContent    = c.meds;
+  document.getElementById('nc-prescriptions').textContent= c.prss;
+
+  const appts = await API.get('/api/appointments/recent');
+  document.getElementById('d-appt').innerHTML = appts.length
+    ? appts.map(a => `<tr>
+        <td><span class="chip">A${pad(a.appt_id)}</span></td>
+        <td>${esc(a.patient_name)}</td>
+        <td>Dr. ${esc(a.doctor_name)}</td>
+        <td style="font-size:12px">${fmtDate(a.appt_date)}</td>
+        <td>${stBadge(a.status)}</td>
+      </tr>`).join('')
+    : emptyRow(5, 'No appointments yet');
+
+  const presc = await API.get('/api/prescriptions/recent');
+  document.getElementById('d-presc').innerHTML = presc.length
+    ? presc.map(p => `<tr>
+        <td><span class="chip">Rx${pad(p.presc_id)}</span></td>
+        <td>${esc(p.patient_name)}</td>
+        <td><span class="badge br">${esc(p.med_name)}</span></td>
+        <td>Dr. ${esc(p.doctor_name)}</td>
+        <td style="text-align:center">${p.quantity}</td>
+      </tr>`).join('')
+    : emptyRow(5, 'No prescriptions yet');
+}
+
+async function renderDoctors() {
+  const rows = await API.get(`/api/doctors?q=${encodeURIComponent(srchTerm)}`);
+  document.getElementById('nc-doctors').textContent = rows.length;
+  document.getElementById('tb-doctors').innerHTML = rows.length
+    ? rows.map(d => `<tr>
+        <td><span class="chip">D${pad(d.doctor_id)}</span></td>
+        <td><strong>${esc(d.name)}</strong></td>
+        <td>${d.specialization ? `<span class="badge bb">${esc(d.specialization)}</span>` : '<span style="color:var(--t3)">—</span>'}</td>
+        <td>${genBadge(d.gender)}</td>
+        <td>${esc(d.phone || '—')}</td>
+        <td style="font-size:12.5px">${esc(d.email || '—')}</td>
+        <td><span class="badge bt">${d.appt_count}</span></td>
+        <td><div class="tact">
+          <button class="btn btn-g btn-xs" onclick="editDoctor(${d.doctor_id})">Edit</button>
+          <button class="btn btn-d btn-xs" onclick="delRecord('doctors','doctor_id',${d.doctor_id},'${esc(d.name)}')">Delete</button>
+        </div></td>
+      </tr>`).join('')
+    : emptyRow(8, 'No doctors found');
+}
+
+async function renderPatients() {
+  const rows = await API.get(`/api/patients?q=${encodeURIComponent(srchTerm)}`);
+  document.getElementById('nc-patients').textContent = rows.length;
+  document.getElementById('tb-patients').innerHTML = rows.length
+    ? rows.map(p => `<tr>
+        <td><span class="chip">P${pad(p.patient_id)}</span></td>
+        <td><strong>${esc(p.name)}</strong></td>
+        <td>${p.age ?? '—'}</td>
+        <td>${genBadge(p.gender)}</td>
+        <td>${esc(p.phone || '—')}</td>
+        <td style="font-size:12.5px">${esc(p.email || '—')}</td>
+        <td style="font-size:12.5px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.address || '—')}</td>
+        <td><span class="badge bt">${p.appt_count}</span></td>
+        <td><div class="tact">
+          <button class="btn btn-g btn-xs" onclick="editPatient(${p.patient_id})">Edit</button>
+          <button class="btn btn-d btn-xs" onclick="delRecord('patients','patient_id',${p.patient_id},'${esc(p.name)}')">Delete</button>
+        </div></td>
+      </tr>`).join('')
+    : emptyRow(9, 'No patients found');
+}
+
+async function renderAppointments() {
+  const rows = await API.get(`/api/appointments?q=${encodeURIComponent(srchTerm)}`);
+  document.getElementById('nc-appointments').textContent = rows.length;
+  document.getElementById('tb-appointments').innerHTML = rows.length
+    ? rows.map(a => `<tr>
+        <td><span class="chip">A${pad(a.appt_id)}</span></td>
+        <td><strong>${esc(a.patient_name)}</strong></td>
+        <td>Dr. ${esc(a.doctor_name)}</td>
+        <td style="font-size:12.5px">${fmtDate(a.appt_date)}</td>
+        <td>${stBadge(a.status)}</td>
+        <td style="font-size:12.5px;color:var(--t3);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(a.notes || '—')}</td>
+        <td><div class="tact">
+          <button class="btn btn-g btn-xs" onclick="editAppointment(${a.appt_id})">Edit</button>
+          <button class="btn btn-d btn-xs" onclick="delRecord('appointments','appt_id',${a.appt_id},'appointment #${a.appt_id}')">Delete</button>
+        </div></td>
+      </tr>`).join('')
+    : emptyRow(7, 'No appointments found');
+}
+
+async function renderMedicines() {
+  const rows = await API.get(`/api/medicines?q=${encodeURIComponent(srchTerm)}`);
+  document.getElementById('nc-medicines').textContent = rows.length;
+  document.getElementById('tb-medicines').innerHTML = rows.length
+    ? rows.map(m => `<tr>
+        <td><span class="chip">M${pad(m.med_id)}</span></td>
+        <td><strong>${esc(m.med_name)}</strong></td>
+        <td>${m.category ? `<span class="badge bt">${esc(m.category)}</span>` : '<span style="color:var(--t3)">—</span>'}</td>
+        <td><span class="badge ba">$${parseFloat(m.price || 0).toFixed(2)}</span></td>
+        <td>${m.stock > 0 ? `<span class="badge bb">${m.stock} units</span>` : '<span class="badge br">Out of stock</span>'}</td>
+        <td><span class="badge bp">${m.times_prescribed}×</span></td>
+        <td><div class="tact">
+          <button class="btn btn-g btn-xs" onclick="editMedicine(${m.med_id})">Edit</button>
+          <button class="btn btn-d btn-xs" onclick="delRecord('medicines','med_id',${m.med_id},'${esc(m.med_name)}')">Delete</button>
+        </div></td>
+      </tr>`).join('')
+    : emptyRow(7, 'No medicines found');
+}
+
+async function renderPrescriptions() {
+  const rows = await API.get(`/api/prescriptions?q=${encodeURIComponent(srchTerm)}`);
+  document.getElementById('nc-prescriptions').textContent = rows.length;
+  document.getElementById('tb-prescriptions').innerHTML = rows.length
+    ? rows.map(p => `<tr>
+        <td><span class="chip">Rx${pad(p.presc_id)}</span></td>
+        <td><span class="chip">A${pad(p.appt_id)}</span></td>
+        <td><strong>${esc(p.patient_name)}</strong></td>
+        <td>Dr. ${esc(p.doctor_name)}</td>
+        <td><span class="badge br">${esc(p.med_name)}</span></td>
+        <td style="text-align:center">${p.quantity}</td>
+        <td style="font-size:12.5px;color:var(--t3);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.notes || '—')}</td>
+        <td><div class="tact">
+          <button class="btn btn-g btn-xs" onclick="editPrescription(${p.presc_id})">Edit</button>
+          <button class="btn btn-d btn-xs" onclick="delRecord('prescriptions','presc_id',${p.presc_id},'prescription #${p.presc_id}')">Delete</button>
+        </div></td>
+      </tr>`).join('')
+    : emptyRow(8, 'No prescriptions found');
+}
+
+// ════════════════════════════════════════════════════════════
+//  MODALS
+// ════════════════════════════════════════════════════════════
+function openModal(sec) {
+  if (sec === 'doctors')      { resetDocForm(); OM('ov-doc'); }
+  if (sec === 'patients')     { resetPatForm(); OM('ov-pat'); }
+  if (sec === 'appointments') { fillApptSelects(); OM('ov-apt'); }
+  if (sec === 'medicines')    { resetMedForm(); OM('ov-med'); }
+  if (sec === 'prescriptions'){ fillPrescSelects(); OM('ov-prs'); }
+}
+function OM(id) { document.getElementById(id).classList.add('open'); }
+function CM(id) { document.getElementById(id).classList.remove('open'); editId = null; }
+document.querySelectorAll('.ov').forEach(o => o.addEventListener('click', e => { if (e.target === o) { o.classList.remove('open'); editId = null; } }));
+
+function resetDocForm() { document.getElementById('mt-doc').textContent='Add Doctor';['df-name','df-spec','df-phone','df-email'].forEach(id=>document.getElementById(id).value='');document.getElementById('df-gender').value='M'; }
+function resetPatForm() { document.getElementById('mt-pat').textContent='Add Patient';['pf-name','pf-age','pf-phone','pf-email','pf-addr'].forEach(id=>document.getElementById(id).value='');document.getElementById('pf-gender').value='M'; }
+function resetMedForm() { document.getElementById('mt-med').textContent='Add Medicine';['mf-name','mf-cat','mf-price','mf-stock'].forEach(id=>document.getElementById(id).value=''); }
+
+async function fillApptSelects() {
+  const [pats, docs] = await Promise.all([API.get('/api/patients'), API.get('/api/doctors')]);
+  document.getElementById('af-pat').innerHTML = pats.length ? pats.map(p => `<option value="${p.patient_id}">${esc(p.name)}</option>`).join('') : '<option disabled>Add patients first</option>';
+  document.getElementById('af-doc').innerHTML = docs.length ? docs.map(d => `<option value="${d.doctor_id}">Dr. ${esc(d.name)} — ${esc(d.specialization || 'General')}</option>`).join('') : '<option disabled>Add doctors first</option>';
+  if (!document.getElementById('af-date').value) document.getElementById('af-date').value = new Date().toISOString().slice(0, 16);
+  document.getElementById('mt-apt').textContent = 'Book Appointment';
+}
+async function fillPrescSelects() {
+  const [apts, meds] = await Promise.all([API.get('/api/appointments'), API.get('/api/medicines')]);
+  document.getElementById('rf-apt').innerHTML = apts.length ? apts.map(a => `<option value="${a.appt_id}">#A${pad(a.appt_id)} — ${esc(a.patient_name)} with Dr. ${esc(a.doctor_name)}</option>`).join('') : '<option disabled>Book appointments first</option>';
+  document.getElementById('rf-med').innerHTML = meds.length ? meds.map(m => `<option value="${m.med_id}">${esc(m.med_name)} ($${parseFloat(m.price || 0).toFixed(2)})</option>`).join('') : '<option disabled>Add medicines first</option>';
+  document.getElementById('mt-prs').textContent = 'New Prescription';
+}
+
+// ════════════════════════════════════════════════════════════
+//  SAVE (Create / Update via API)
+// ════════════════════════════════════════════════════════════
+async function saveDoctor() {
+  const name = document.getElementById('df-name').value.trim();
+  if (!name) { toast('Name is required', 'e'); return; }
+  const body = { name, specialization: document.getElementById('df-spec').value.trim(), gender: document.getElementById('df-gender').value, phone: document.getElementById('df-phone').value.trim(), email: document.getElementById('df-email').value.trim() };
+  try {
+    if (editId) { await API.put(`/api/doctors/${editId}`, body); toast('Doctor updated', 's'); }
+    else        { await API.post('/api/doctors', body);          toast('Doctor added', 's'); }
+    CM('ov-doc'); render('doctors'); renderDash();
+  } catch(e) { toast(e.message, 'e'); }
+}
+async function editDoctor(id) {
+  const d = await API.get(`/api/doctors/${id}`);
+  editId = id;
+  document.getElementById('mt-doc').textContent = 'Edit Doctor';
+  document.getElementById('df-name').value  = d.name;
+  document.getElementById('df-spec').value  = d.specialization || '';
+  document.getElementById('df-gender').value= d.gender || 'M';
+  document.getElementById('df-phone').value = d.phone || '';
+  document.getElementById('df-email').value = d.email || '';
+  OM('ov-doc');
+}
+
+async function savePatient() {
+  const name = document.getElementById('pf-name').value.trim();
+  if (!name) { toast('Name is required', 'e'); return; }
+  const body = { name, age: document.getElementById('pf-age').value || null, gender: document.getElementById('pf-gender').value, phone: document.getElementById('pf-phone').value.trim(), email: document.getElementById('pf-email').value.trim(), address: document.getElementById('pf-addr').value.trim() };
+  try {
+    if (editId) { await API.put(`/api/patients/${editId}`, body); toast('Patient updated', 's'); }
+    else        { await API.post('/api/patients', body);           toast('Patient added', 's'); }
+    CM('ov-pat'); render('patients'); renderDash();
+  } catch(e) { toast(e.message, 'e'); }
+}
+async function editPatient(id) {
+  const p = await API.get(`/api/patients/${id}`);
+  editId = id;
+  document.getElementById('mt-pat').textContent = 'Edit Patient';
+  document.getElementById('pf-name').value  = p.name;
+  document.getElementById('pf-age').value   = p.age || '';
+  document.getElementById('pf-gender').value= p.gender || 'M';
+  document.getElementById('pf-phone').value = p.phone || '';
+  document.getElementById('pf-email').value = p.email || '';
+  document.getElementById('pf-addr').value  = p.address || '';
+  OM('ov-pat');
+}
+
+async function saveAppointment() {
+  const patient_id = parseInt(document.getElementById('af-pat').value);
+  const doctor_id  = parseInt(document.getElementById('af-doc').value);
+  const appt_date  = document.getElementById('af-date').value;
+  if (!patient_id || !doctor_id || !appt_date) { toast('All required fields must be filled', 'e'); return; }
+  const body = { patient_id, doctor_id, appt_date, status: document.getElementById('af-status').value, notes: document.getElementById('af-notes').value.trim() };
+  try {
+    if (editId) { await API.put(`/api/appointments/${editId}`, body); toast('Appointment updated', 's'); }
+    else        { await API.post('/api/appointments', body);          toast('Appointment booked', 's'); }
+    CM('ov-apt'); render('appointments'); renderDash();
+  } catch(e) { toast(e.message, 'e'); }
+}
+async function editAppointment(id) {
+  const a = await API.get(`/api/appointments/${id}`);
+  editId = id;
+  await fillApptSelects();
+  document.getElementById('mt-apt').textContent = 'Edit Appointment';
+  document.getElementById('af-pat').value    = a.patient_id;
+  document.getElementById('af-doc').value    = a.doctor_id;
+  document.getElementById('af-date').value   = a.appt_date.replace(' ', 'T').slice(0, 16);
+  document.getElementById('af-status').value = a.status;
+  document.getElementById('af-notes').value  = a.notes || '';
+  OM('ov-apt');
+}
+
+async function saveMedicine() {
+  const med_name = document.getElementById('mf-name').value.trim();
+  if (!med_name) { toast('Medicine name required', 'e'); return; }
+  const body = { med_name, category: document.getElementById('mf-cat').value.trim(), price: parseFloat(document.getElementById('mf-price').value) || 0, stock: parseInt(document.getElementById('mf-stock').value) || 0 };
+  try {
+    if (editId) { await API.put(`/api/medicines/${editId}`, body); toast('Medicine updated', 's'); }
+    else        { await API.post('/api/medicines', body);          toast('Medicine added', 's'); }
+    CM('ov-med'); render('medicines'); renderDash();
+  } catch(e) { toast(e.message, 'e'); }
+}
+async function editMedicine(id) {
+  const m = await API.get(`/api/medicines/${id}`);
+  editId = id;
+  document.getElementById('mt-med').textContent = 'Edit Medicine';
+  document.getElementById('mf-name').value  = m.med_name;
+  document.getElementById('mf-cat').value   = m.category || '';
+  document.getElementById('mf-price').value = m.price || '';
+  document.getElementById('mf-stock').value = m.stock || '';
+  OM('ov-med');
+}
+
+async function savePrescription() {
+  const appt_id = parseInt(document.getElementById('rf-apt').value);
+  const med_id  = parseInt(document.getElementById('rf-med').value);
+  if (!appt_id || !med_id) { toast('Appointment and medicine required', 'e'); return; }
+  const body = { appt_id, med_id, quantity: parseInt(document.getElementById('rf-qty').value) || 1, notes: document.getElementById('rf-notes').value.trim() };
+  try {
+    if (editId) { await API.put(`/api/prescriptions/${editId}`, body); toast('Prescription updated', 's'); }
+    else        { await API.post('/api/prescriptions', body);          toast('Prescription saved', 's'); }
+    CM('ov-prs'); render('prescriptions'); renderDash();
+  } catch(e) { toast(e.message, 'e'); }
+}
+async function editPrescription(id) {
+  const p = await API.get(`/api/prescriptions/${id}`);
+  editId = id;
+  await fillPrescSelects();
+  document.getElementById('mt-prs').textContent = 'Edit Prescription';
+  document.getElementById('rf-apt').value  = p.appt_id;
+  document.getElementById('rf-med').value  = p.med_id;
+  document.getElementById('rf-qty').value  = p.quantity;
+  document.getElementById('rf-notes').value= p.notes || '';
+  OM('ov-prs');
+}
+
+// ════════════════════════════════════════════════════════════
+//  DELETE
+// ════════════════════════════════════════════════════════════
+async function delRecord(resource, col, id, label) {
+  if (!confirm(`Delete "${label}"?\n\nThis cannot be undone.`)) return;
+  try {
+    await API.del(`/api/${resource}/${id}`);
+    toast('Deleted', 'i');
+    render(curSec); renderDash();
+  } catch(e) { toast(e.message, 'e'); }
+}
+
+// ════════════════════════════════════════════════════════════
+//  UTILS
+// ════════════════════════════════════════════════════════════
+function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function pad(n) { return String(n).padStart(3, '0'); }
+function fmtDate(s) { if (!s) return '—'; const d = new Date(s); return d.toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) + ' ' + d.toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'}); }
+function stBadge(s) { const m = {Scheduled:'bb',Completed:'bt',Cancelled:'br','No-Show':'ba'}; return `<span class="badge ${m[s]||'bg2'}"><span class="bd-dot"></span>${esc(s)}</span>`; }
+function genBadge(g) { const m={M:'bb',F:'bp',Other:'ba'}; const l={M:'Male',F:'Female',Other:'Other'}; return `<span class="badge ${m[g]||'bg2'}">${l[g]||esc(g)||'—'}</span>`; }
+function emptyRow(cols, msg) { return `<tr><td colspan="${cols}"><div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/></svg><h3>${esc(msg)}</h3><p>Use the button above to add records.</p></div></td></tr>`; }
+
+// Toasts
+function toast(msg, type = 'i') {
+  const icons = {
+    s:`<svg viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`,
+    e:`<svg viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+    i:`<svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/></svg>`,
+  };
+  const map = {s:'ts', e:'te', i:'ti'};
+  const el = document.createElement('div');
+  el.className = `toast ${map[type]||'ti'}`;
+  el.innerHTML = `<div class="tico">${icons[type]||icons.i}</div><div class="tmsg">${esc(msg)}</div>`;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+
+// ── BOOT ──────────────────────────────────────────────────────
+renderDash();
+</script>
+</body>
+</html>
